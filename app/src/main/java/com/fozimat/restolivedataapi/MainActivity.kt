@@ -9,6 +9,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import com.fozimat.restolivedataapi.databinding.ActivityMainBinding
+import com.google.android.material.snackbar.Snackbar
 
 class MainActivity : AppCompatActivity() {
 
@@ -26,8 +27,8 @@ class MainActivity : AppCompatActivity() {
             binding.tvTitle.text = restaurant.name
             binding.tvDescription.text = restaurant.description
             Glide.with(this)
-                    .load("https://restaurant-api.dicoding.dev/images/large/${restaurant.pictureId}")
-                    .into(binding.ivPicture)
+                .load("https://restaurant-api.dicoding.dev/images/large/${restaurant.pictureId}")
+                .into(binding.ivPicture)
         })
 
         mainViewModel.listReview.observe(this, { consumerReviews ->
@@ -36,12 +37,18 @@ class MainActivity : AppCompatActivity() {
             }
 
             binding.lvReview.adapter =
-                    ArrayAdapter(this, R.layout.item_review, listReview)
+                ArrayAdapter(this, R.layout.item_review, listReview)
             binding.edReview.setText("")
         })
 
         mainViewModel.isLoading.observe(this, {
             binding.progressBar.visibility = if (it) View.VISIBLE else View.GONE
+        })
+
+        mainViewModel.snackbarText.observe(this, {
+            it.getContentIfNotHandled()?.let {
+                Snackbar.make(window.decorView.rootView, it, Snackbar.LENGTH_SHORT).show()
+            }
         })
 
         binding.btnSend.setOnClickListener { view ->
